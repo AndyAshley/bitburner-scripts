@@ -1,6 +1,6 @@
 /**
+ * @param {NS} ns
  * Handles server management for various tasks such as purchasing, upgrading, and renaming servers.
- * @param {*} ns - The Bitburner Netscript environment.
  * @argument {string} ns.args[0] - The action to take ("purchase", "purchase-price", "upgrade", "upgrade-cost", "rename").
  * @argument {string} [ns.args[1] - The name of the server for actions like purchase, upgrade, and rename.
  * @argument {number} [ns.args[2] - The amount of RAM to purchase or upgrade to.
@@ -34,6 +34,16 @@ export async function main(ns) {
       ns.renamePurchasedServer(serverToRename, newServerName);
       ns.tprint(`Renaming server [${serverToRename}] to [${newServerName}]`);
       break;
+    case "list":
+      const serverList = ns.getPurchasedServers();
+      ns.tprint(
+        `\n-------------------------------------\n` +
+          "Current owned servers:" +
+          `\n-------------------------------------\n` +
+          `${serverList.sort().join("\n")}` +
+          `\n-------------------------------------`
+      );
+      break;
     case "help":
       ns.tprint(
         `\nUsage:\n` +
@@ -41,7 +51,8 @@ export async function main(ns) {
           `  purchase-price [ram] - Display the cost to purchase a server with the specified amount of RAM.\n` +
           `  upgrade [name] [ram] - Upgrade a server with the specified name to the specified amount of RAM.\n` +
           `  upgrade-cost [name] [ram] - Display the cost to upgrade a server to the specified amount of RAM.\n` +
-          `  rename [null] [null] [oldName] [newName] - Rename a server from oldName to newName.`
+          `  rename [null] [null] [oldName] [newName] - Rename a server from oldName to newName.\n` +
+          `  list - Display a list of owned servers.`
       );
       break;
     default:

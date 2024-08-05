@@ -14,4 +14,6 @@ These scripts are designed to help progress in the game more efficiently.
 - **servers.js**: A friendly interface for managing servers. This script allows you to easily view,interact with, purchase,
   and upgrade servers on your home network.
 
+---
+
 Note: I will continue to add more scripts as I write/refine them.
