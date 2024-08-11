@@ -39,7 +39,6 @@ export async function main(ns) {
           // If the server has 0 money the multiplier would be infinite, so we set it to 1 to avoid errors
           let multiplier = serverCurMoney === 0 ? 1 : Math.ceil(moneyThresh / serverCurMoney);
           let growThreads = ns.growthAnalyze(target, multiplier);
-          ns.write(fileName, `${(multiplier, growThreads)}`, "a");
 
           // If the optimal threads are greater than the available threads, we need to adjust the multiplier
           if (growThreads > availableThreads) {
