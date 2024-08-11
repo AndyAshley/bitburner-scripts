@@ -13,6 +13,7 @@ export async function main(ns) {
   let ram = ns.args[2];
   let serverToRename = ns.args[3];
   let newServerName = ns.args[4];
+  const owned = ns.getPurchasedServers();
 
   switch (ns.args[0]) {
     case "purchase":
@@ -20,7 +21,9 @@ export async function main(ns) {
       break;
     case "purchase-price":
       const serverCost = ns.getPurchasedServerCost(ram);
-      ns.tprint(`The cost to purchase a new server with ${ram}GB of RAM is: \$${formatNumber(serverCost)}`);
+      ns.tprint(
+        `The cost to purchase a new server with ${Math.ceil(ram / 1e3)}GB of RAM is: \$${formatNumber(serverCost)}`
+      );
       break;
     case "upgrade":
       ns.upgradePurchasedServer(name, ram);
@@ -35,14 +38,23 @@ export async function main(ns) {
       ns.tprint(`Renaming server [${serverToRename}] to [${newServerName}]`);
       break;
     case "list":
-      const serverList = ns.getPurchasedServers();
       ns.tprint(
         `\n-------------------------------------\n` +
           "Current owned servers:" +
           `\n-------------------------------------\n` +
-          `${serverList.sort().join("\n")}` +
+          `${owned.sort().join("\n")}` +
           `\n-------------------------------------`
       );
+      break;
+    case "remove":
+      if (owned.includes(name)) {
+        const prompt = `Are you sure you want to permanently delete the server : ${name} ?`;
+        const answer = await promptUser(ns, prompt);
+
+        answer ? ns.deleteServer(name) : ns.tprint(`Removed Server Operation on [${name}] Canceled.`);
+      } else {
+        ns.tprint(`Server [${name}] is not currently recognized or owned.`);
+      }
       break;
     case "help":
       ns.tprint(
@@ -52,7 +64,8 @@ export async function main(ns) {
           `  upgrade [name] [ram] - Upgrade a server with the specified name to the specified amount of RAM.\n` +
           `  upgrade-cost [name] [ram] - Display the cost to upgrade a server to the specified amount of RAM.\n` +
           `  rename [null] [null] [oldName] [newName] - Rename a server from oldName to newName.\n` +
-          `  list - Display a list of owned servers.`
+          `  list - Display a list of owned servers.\n` +
+          `  remove [name] - Prompts to delete the input server (Yes or No dialog).`
       );
       break;
     default:
@@ -75,4 +88,10 @@ function formatNumber(num) {
     unitIndex++;
   } while (num >= 1e3 && unitIndex < units.length - 1);
   return `${num.toFixed(2)}${units[unitIndex]}`;
+}
+
+// Prompt the user, boolean value returned
+async function promptUser(ns, prompt) {
+  const response = await ns.prompt(prompt, { type: "boolean" });
+  return response;
 }
